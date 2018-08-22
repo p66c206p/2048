@@ -1,0 +1,121 @@
+@charset "utf-8";
+
+body {
+  background: #faf8ef;
+  font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+table {
+  background: #bbada0;
+  margin: 60px auto;
+  border-radius: 3px;
+  border-spacing: 15px;
+  overflow: hidden;
+  text-align: center;
+  font-size: 45px;
+  font-weight: bold;
+}
+  @media screen and (max-width: 520px) {
+    table {
+      border-radius: 6px;
+      border-spacing: 10px;
+      font-size: 35px;
+    }
+  }
+
+table td {
+  padding: 0px;
+  width: 104px;
+  height: 104px;
+  background: #cdbfb3;
+  border-radius: 3px;
+}
+  @media screen and (max-width: 520px) {
+    table td {
+      width: 58px;
+      height: 58px;
+      border-radius: 3px;
+    }
+  }
+
+[class="cell 2"] {
+  color: #776e65;
+  background: #eee4da;
+}
+[class="cell 4"] {
+  color: #776e65;
+  background: #ede0c8;
+}
+[class="cell 8"] {
+  color: #f9f6f2;
+  background: #f2b179;
+}
+[class="cell 16"] {
+  color: #f9f6f2;
+  background: #f59563;
+}
+[class="cell 32"] {
+  color: #f9f6f2;
+  background: #f67c5f;
+}
+[class="cell 64"] {
+  color: #f9f6f2;
+  background: #f65e3b;
+}
+[class="cell 128"] {
+  color: #f9f6f2;
+  background: #edcf72;
+}
+  @media screen and (max-width: 520px) {
+    [class="cell 128"] {
+      font-size: 25px;
+    }
+  }
+[class="cell 256"] {
+  color: #f9f6f2;
+  background: #edcc61;
+}
+  @media screen and (max-width: 520px) {
+    [class="cell 256"] {
+      font-size: 25px;
+    }
+  }
+[class="cell 512"] {
+  color: #f9f6f2;
+  background: #edc850;
+}
+  @media screen and (max-width: 520px) {
+    [class="cell 512"] {
+      font-size: 25px;
+    }
+  }
+[class="cell 1024"] {
+  font-size: 35px;
+  color: #f9f6f2;
+  background: #edc53f;
+}
+  @media screen and (max-width: 520px) {
+    [class="cell 1024"] {
+      font-size: 15px;
+    }
+  }
+[class="cell 2048"] {
+  font-size: 35px;
+  color: #f9f6f2;
+  background: #edc22e;
+}
+  @media screen and (max-width: 520px) {
+    [class="cell 2048"] {
+      font-size: 15px;
+    }
+  }
+[class="cell 2048over"] {
+  font-size: 30px;
+  color: #f9f6f2;
+  background: #3c3a32;
+}
+  @media screen and (max-width: 520px) {
+    [class="cell 2048"] {
+      font-size: 10px;
+    }
+  }
