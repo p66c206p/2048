@@ -1,6 +1,11 @@
-const N = 4;
-const probability_2 = 0.75;
-const clearValue = 2048;
+/*
+ * @file main.js
+ * @brief 盤面の操作、ゲームとしての動作
+ */
+
+const N = 4;                  // 盤面のサイズ(N x N)
+const probability_2 = 0.75;   // 新しく生成されるタイルの値が2である確率
+const clearValue = 2048;      // ゲームクリアとする時のタイルの最大値
 
 class Board {
   constructor() {
@@ -45,7 +50,6 @@ class Board {
       for (var y = 0; y < N; y++) {
         tag.push('<td ');
 
-        // 新しいタイルはid:newを付与
         if (this[[x, y]] == 'new2' || this[[x, y]] == 'new4') {
           tag.push('id="new-tile" ');
           if (this[[x, y]] == 'new2'){
@@ -56,7 +60,6 @@ class Board {
         }
 
         tag.push('class="cell ');
-        // 2048より大きい場合、class名を統一
         if (this[[x, y]] > 2048) {
           tag.push('2048over');
         } else {
@@ -72,19 +75,23 @@ class Board {
     tag.push('</table>');
 
     $('#game-board').html(tag.join(''));
+
+    // 新しく生成されたタイルに対するアニメーション
     $('#new-tile').hide();
     $('#new-tile').show(300);
   }
 
   move(direction) {
+    // arrangeメソッドを用いて、
+    // 1行or1列ずつ、引数directionの方向へ寄せる処理
+
     var line = [];
 
-    // [↑][↓]の場合は軸を逆にする
+    // [↑][↓]の場合は対象が行でなく列の為、便宜上行列を反転させる
     if (direction == 'up' || direction == 'down') {
       this.reverseXY();
     }
 
-    // 各ラインで整列させる
     for (var x = 0; x < N; x++) {
       for (var y = 0; y < N; y++) {
         line[y] = this[[x, y]];
@@ -103,18 +110,22 @@ class Board {
   }
 
   arrange(line, direction) {
+    // ex.
+    // ([2, null, 2, 4], 'left') => ([4, 4, null, null], 'left')
+    // ([4, 2, 2, 2], 'down') => ([null, 4, 2, 4], 'down')
+    // ※同値が連続する(nullを挟んでも可)と、前方の値は2倍に、後方の要素は削除される。
+
     var xline = line;
 
     // nullを削除
     line = line.filter(v => v);
 
-    // [→][↓]の時は配列を逆順で処理する
+    // ※[→][↓]の時は配列を逆向きに寄せたい為
     if (direction == 'right' || direction == 'down') {
       line.reverse();
       var lineIsReversed = true;
     }
 
-    // 同値が連続する場合、前方の値を2倍にし後方を削除する
     for (var i = 0; i < line.length - 1; i++) {
       if (line[i] == line[i + 1]) {
         line[i] *= 2;
@@ -127,12 +138,10 @@ class Board {
       line.push(null);
     }
 
-    // 逆にした配列を元に戻す
     if (lineIsReversed) {
       line.reverse();
     }
 
-    // 処理前後で配列に変化があった場合movedとする
     for (var i = 0; i < N; i++) {
       if (xline[i] != line[i]) {
         this.isMoved = true;
@@ -205,15 +214,15 @@ $('#new-game').click(function() {
 
 // 矢印キーでの操作
 function selectMoveBykeyDown(e) {
-  var directionBy = {
+  var direction = {
     '37' : 'left',
     '38' : 'up',
     '39' : 'right',
     '40' : 'down',
   };
 
-  if (directionBy[e.keyCode]) {
-    board.move(directionBy[e.keyCode]);
+  if (direction[e.keyCode]) {
+    board.move(direction[e.keyCode]);
   }
 
   if (board.isMoved) {
@@ -237,7 +246,7 @@ window.addEventListener('load', function(event) {
   // 開始時
   gameBoard.addEventListener('touchstart', function(event) {
     event.preventDefault();
-    // 座標の取得
+
     touchStartX = event.touches[0].pageX;
     touchStartY = event.touches[0].pageY;
   }, false);
@@ -245,10 +254,11 @@ window.addEventListener('load', function(event) {
   // 移動時
   gameBoard.addEventListener('touchmove', function(event) {
     event.preventDefault();
-    // 座標の取得
+
     touchMoveX = event.changedTouches[0].pageX;
     touchMoveY = event.changedTouches[0].pageY;
   }, false);
+
   // 終了時
   gameBoard.addEventListener('touchend', function(event) {
     XLength = touchMoveX - touchStartX
