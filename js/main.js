@@ -252,6 +252,7 @@ window.addEventListener('load', function(event) {
 
 $('#new-game').click(function() {
   board.initialize();
+  console.log(3);
 });
 
 // 矢印キーでの操作
