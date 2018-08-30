@@ -7,22 +7,19 @@
 var board = new Board();
 var newGame = document.getElementById('new-game');
 var gameBoard = document.getElementById('game-board');
-var touchStartX, touchStartY;
-var touchMoveX, touchMoveY;
-var XLength, YLength;
+var touchStartX, touchStartY, touchMoveX, touchMoveY;
 
 // - main -
 window.onload = function() {
-  console.log(80);
+  console.log(2);
   gameStart();
 
   // イベントの登録
-  newGame.addEventListener('click', gameStart, false);
-  window.addEventListener('keydown', keyDown);
-  gameBoard.addEventListener('touchstart', touchStart);
+  newGame.addEventListener('click', gameStart);
+  window.addEventListener('keydown', keyDown);            // キー操作
+  gameBoard.addEventListener('touchstart', touchStart);   // フリック操作
   gameBoard.addEventListener('touchmove', touchMove);
   gameBoard.addEventListener('touchend', touchEnd);
-
 }
 
 // - event -
@@ -32,10 +29,10 @@ function gameStart() {
 
 function keyDown(event) {
   var direction = {
-    '37' : 'left' , // key:[←]
-    '38' : 'up'   , // key:[↑]
-    '39' : 'right', // key:[→]
-    '40' : 'down'   // key:[↓]
+    '37' : 'left' ,   // key: [←]
+    '38' : 'up'   ,   // key: [↑]
+    '39' : 'right',   // key: [→]
+    '40' : 'down'     // key: [↓]
   };
 
   if (direction[event.keyCode]) {
@@ -58,8 +55,8 @@ function touchMove(event) {
 }
 
 function touchEnd(event) {
-  XLength = touchMoveX - touchStartX;
-  YLength = touchMoveY - touchStartY;
+  var XLength = touchMoveX - touchStartX;
+  var YLength = touchMoveY - touchStartY;
   var XMoveThanY = (Math.abs(XLength) > Math.abs(YLength));
 
   if (XMoveThanY) {
