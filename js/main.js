@@ -41,7 +41,7 @@ function moveBoardWithKey(event) {
 }
 
 function flickStart(event) {
-  // event.preventDefault();
+  event.preventDefault();
 
   touchStartX = event.touches[0].pageX;
   touchStartY = event.touches[0].pageY;
