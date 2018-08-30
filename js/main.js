@@ -4,21 +4,21 @@
  */
 
 const N = 4;                  // 盤面のサイズ(N x N)
-const probability_2 = 0.75;   // 新しく生成されるタイルの値が2である確率
-const clearValue = 2048;      // ゲームクリアとする時のタイルの最大値
+const PROBABILITY_2 = 0.75;   // 新しく生成されるタイルの値が2である確率
+const CLEAR_VALUE = 2048;      // ゲームクリアとする時のタイルの最大値
 
 class Board {
   constructor() {
-    this.isMoved = false;
     this.isCleared = false;
-    this.isReversed = false;
+    this.isTransposed = false;
   }
 
   initialize() {
     // x = rows, y = columns
     for (var x = 0; x < N; x++) {
+      this[x] = [];
       for (var y = 0; y < N; y++) {
-        this[[x, y]] = null;
+        this[x][y] = null;
       }
     }
 
@@ -30,12 +30,13 @@ class Board {
     do {
         var x = Math.floor(Math.random() * N);
         var y = Math.floor(Math.random() * N);
-    } while (this[[x, y]] != null);
+    } while (this[x][y] != null);
 
-    if (Math.random() < probability_2) {
-      this[[x, y]] = 'new2'
+    // 下記drawメソッドにて、新しいタイルにidを付与する為に便宜上値を'newX'とする
+    if (Math.random() < PROBABILITY_2) {
+      this[x][y] = 'new2';
     } else {
-      this[[x, y]] = 'new4'
+      this[x][y] = 'new4';
     }
 
     this.draw();
@@ -50,24 +51,24 @@ class Board {
       for (var y = 0; y < N; y++) {
         tag.push('<td ');
 
-        if (this[[x, y]] == 'new2' || this[[x, y]] == 'new4') {
+        if (this[x][y] == 'new2' || this[x][y] == 'new4') {
           tag.push('id="new-tile" ');
-          if (this[[x, y]] == 'new2'){
-            this[[x, y]] = 2;
+          if (this[x][y] == 'new2'){
+            this[x][y] = 2;
           } else {
-            this[[x, y]] = 4;
+            this[x][y] = 4;
           }
         }
 
         tag.push('class="cell ');
-        if (this[[x, y]] > 2048) {
+        if (this[x][y] > 2048) {
           tag.push('2048over');
         } else {
-          tag.push(this[[x, y]]);
+          tag.push(this[x][y]);
         }
 
         tag.push('">');
-        tag.push(this[[x, y]]);
+        tag.push(this[x][y]);
         tag.push('</td>');
       }
       tag.push('</tr>');
@@ -76,129 +77,170 @@ class Board {
 
     $('#game-board').html(tag.join(''));
 
-    // 新しく生成されたタイルに対するアニメーション
+    // 新しく生成されたタイルが浮き上がって表示されるアニメーション
     $('#new-tile').hide();
     $('#new-tile').show(300);
   }
 
   move(direction) {
-    // arrangeメソッドを用いて、
-    // 1行or1列ずつ、引数directionの方向へ寄せる処理
+    // タイルをdirection方向に寄せるメソッド
+    // 盤面が変わった場合はその後の処理も行う
 
-    var line = [];
+    this.replaceElementsIfNeeded(direction);
 
-    // [↑][↓]の場合は対象が行でなく列の為、便宜上行列を反転させる
-    if (direction == 'up' || direction == 'down') {
-      this.reverseXY();
-    }
+    var hasChanged = false;
 
-    for (var x = 0; x < N; x++) {
-      for (var y = 0; y < N; y++) {
-        line[y] = this[[x, y]];
-      }
+    for (var i = 0; i < N; i++) {
+      var xthis_i = this[i];
 
-      line = this.arrange(line, direction);
+      this[i] = this.arrange(this[i]);
 
-      for (var y = 0; y < N; y++) {
-        this[[x, y]] = line[y];
+      if (hasChanged) continue;
+      if (!this.isEqual(xthis_i, this[i])) {
+        hasChanged = true;
       }
     }
 
-    if (this.isReversed) {
-      this.reverseXY();
+    this.undoIfReplaced(direction);
+
+    if (hasChanged) {
+      this.addNewTile();
+      this.checkGameState();
     }
   }
 
-  arrange(line, direction) {
-    // ex.
-    // ([2, null, 2, 4], 'left') => ([4, 4, null, null], 'left')
-    // ([4, 2, 2, 2], 'down') => ([null, 4, 2, 4], 'down')
-    // ※同値が連続する(nullを挟んでも可)と、前方の値は2倍に、後方の要素は削除される。
+  replaceElementsIfNeeded(direction) {
+    // 動く方向に応じて、this[0]～this[3]の配列要素の値を入れ直す。
+    // 1234  ex.  left => this[0] = [1, 2, 3, 4] (※入れ直さない)
+    // 5678      right => this[0] = [4, 3, 2, 1]
+    // 9ABC         up => this[0] = [1, 5, 9, D]
+    // DEFG       down => this[0] = [D, 9, 5, 1]
 
-    var xline = line;
-
-    // nullを削除
-    line = line.filter(v => v);
-
-    // ※[→][↓]の時は配列を逆向きに寄せたい為
-    if (direction == 'right' || direction == 'down') {
-      line.reverse();
-      var lineIsReversed = true;
+    if (direction == 'up' || direction == 'down') {
+      this.transpose();
     }
 
-    for (var i = 0; i < line.length - 1; i++) {
-      if (line[i] == line[i + 1]) {
-        line[i] *= 2;
-        line.splice(i + 1, 1);
+    if (direction == 'right' || direction == 'down') {
+      for (var i = 0; i < N; i++) {
+        this[i].reverse();
+      }
+    }
+  }
+
+  arrange(array) {
+    // ex. [2, null, 2, 4] => [4, 4, null, null] (※[8, null,...]とはならない)
+
+    // nullの要素を削除
+    array = array.filter(value => value != null);
+
+    // array.length - 1 回だけ前後の値を比較したいので、
+    // array.length を N としてはいけない
+    for (var i = 0; i < array.length - 1; i++) {
+      if (array[i] == array[i + 1]) {
+        array[i] *= 2;
+        array.splice(i + 1, 1);
       }
     }
 
     // 要素数を元に戻す
-    while (line.length < N) {
-      line.push(null);
+    while (array.length < N) {
+      array.push(null);
     }
 
-    if (lineIsReversed) {
-      line.reverse();
+    return array;
+  }
+
+  undoIfReplaced(direction) {
+    // replaceElementsIfNeededで入れ替えられた対象を元に戻す。
+
+    if (direction == 'right' || direction == 'down') {
+      for (var i = 0; i < N; i++) {
+        this[i].reverse();
+      }
     }
+
+    if (direction == 'up' || direction == 'down') {
+      this.transpose();
+    }
+  }
+
+  checkGameState() {
+    if (this.hasJustReachedClearValue()) {
+      alert('ゲームクリアです！');
+    }
+
+    if (!this.canMove()) {
+      setTimeout('alert("ゲームオーバーです。")', 300);
+    }
+  }
+
+  transpose() {
+    var tmpBoard = [];
+
+    for (var y = 0; y < N; y++) {
+      tmpBoard[y] = [];
+      for (var x = 0; x < N; x++) {
+        tmpBoard[y][x] = this[x][y];
+      }
+    }
+
+    for (var x = 0; x < N; x++) {
+      for (var y = 0; y < N; y++) {
+        this[x][y] = tmpBoard[x][y];
+      }
+    }
+
+    this.isTransposed = !this.isTransposed;
+  }
+
+  isEqual(a, b) {
+    if (!Array.isArray(a) || !Array.isArray(b)) return false;
+
+    if (a.toString() == b.toString()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  hasJustReachedClearValue() {
+    if (this.isCleared) return false;
 
     for (var i = 0; i < N; i++) {
-      if (xline[i] != line[i]) {
-        this.isMoved = true;
-        break;
+      if (this[i].some(value => value == CLEAR_VALUE)) {
+        this.isCleared = true;
+        return true;
       }
     }
 
-    return line;
+    return false;
   }
 
-  checkGameOver() {
-    var tileValues = Object.values(this);
-    var maxValue = Math.max.apply(null,(tileValues));
-
-    if (!this.isCleared && maxValue == clearValue) {
-      alert('ゲームクリアです！');
-      this.isCleared = true;
+  canMove() {
+    for (var i = 0; i < N; i++) {
+      if (this[i].includes(null)) {
+        return true;
+      }
     }
 
-    // 空白のタイルがなく、
-    // 隣同士の値が同じタイルがないならば、ゲームオーバー
-    if (tileValues.includes(null)) {
-      return;
-    }
-    for (var i = 0; i < 2; i++) {
-      for (var x = 0; x < N; x++) {
-        for (var y = 0; y < N - 1; y++) {
-          if (this[[x, y]] == this[[x, y + 1]]) {
-            if (this.isReversed) {
-              this.reverseXY();
-            }
-            return;
+    for (var x = 0; x < N; x++) {
+      for (var y = 0; y < N - 1; y++) {
+        if (this[x][y] == this[x][y + 1]) {
+          if (this.isTransposed) {
+            this.transpose();
           }
+          return true;
         }
       }
-    this.reverseXY();
     }
 
-    alert('ゲームオーバーです。');
-  }
-
-  reverseXY() {
-    var tmpBoard = {};
-
-    for (var x = 0; x < N; x++) {
-      for (var y = 0; y < N; y++) {
-        tmpBoard[[y, x]] = this[[x, y]];
-      }
+    if (!this.isTransposed) {
+      this.transpose();
+      return this.canMove();
     }
 
-    for (var x = 0; x < N; x++) {
-      for (var y = 0; y < N; y++) {
-        this[[x, y]] = tmpBoard[[x, y]];
-      }
-    }
-
-    this.isReversed = !this.isReversed;
+    this.transpose();
+    return false;
   }
 }
 
@@ -224,46 +266,37 @@ function selectMoveBykeyDown(e) {
   if (direction[e.keyCode]) {
     board.move(direction[e.keyCode]);
   }
-
-  if (board.isMoved) {
-    board.addNewTile();
-    board.checkGameOver();
-    board.isMoved = false;
-  }
 }
 document.onkeydown = selectMoveBykeyDown;
 
 // フリック操作
 var gameBoard = document.getElementById('game-board');
 window.addEventListener('load', function(event) {
-  var touchStartX;
-  var touchStartY;
-  var touchMoveX;
-  var touchMoveY;
-  var XLength;
-  var YLength;
+  // var touchStartX, touchStartY;
+  // var touchMoveX, touchMoveY;
+  // var XLength, YLength;
 
   // 開始時
   gameBoard.addEventListener('touchstart', function(event) {
     event.preventDefault();
 
-    touchStartX = event.touches[0].pageX;
-    touchStartY = event.touches[0].pageY;
+    var touchStartX = event.touches[0].pageX;
+    var touchStartY = event.touches[0].pageY;
   }, false);
 
   // 移動時
   gameBoard.addEventListener('touchmove', function(event) {
     event.preventDefault();
 
-    touchMoveX = event.changedTouches[0].pageX;
-    touchMoveY = event.changedTouches[0].pageY;
+    var touchMoveX = event.changedTouches[0].pageX;
+    var touchMoveY = event.changedTouches[0].pageY;
   }, false);
 
   // 終了時
   gameBoard.addEventListener('touchend', function(event) {
-    XLength = touchMoveX - touchStartX
-    YLength = touchMoveY - touchStartY
-    XMoveThanY = (Math.abs(XLength) > Math.abs(YLength))
+    var XLength = touchMoveX - touchStartX
+    var YLength = touchMoveY - touchStartY
+    var XMoveThanY = (Math.abs(XLength) > Math.abs(YLength))
 
     // 移動量の判定
     if (XMoveThanY) {
@@ -278,12 +311,6 @@ window.addEventListener('load', function(event) {
       } else if (YLength > 50) {
         board.move('down');
       }
-    }
-
-    if (board.isMoved) {
-      board.addNewTile();
-      board.checkGameOver();
-      board.isMoved = false;
     }
   }, false);
 }, false);
