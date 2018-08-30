@@ -252,7 +252,7 @@ window.addEventListener('load', function(event) {
 
 $('#new-game').click(function() {
   board.initialize();
-  console.log(3);
+  console.log(4);
 });
 
 // 矢印キーでの操作
@@ -273,31 +273,31 @@ document.onkeydown = selectMoveBykeyDown;
 // フリック操作
 var gameBoard = document.getElementById('game-board');
 window.addEventListener('load', function(event) {
-  // var touchStartX, touchStartY;
-  // var touchMoveX, touchMoveY;
-  // var XLength, YLength;
+  var touchStartX, touchStartY;
+  var touchMoveX, touchMoveY;
+  var XLength, YLength;
 
   // 開始時
   gameBoard.addEventListener('touchstart', function(event) {
     event.preventDefault();
 
-    var touchStartX = event.touches[0].pageX;
-    var touchStartY = event.touches[0].pageY;
+    touchStartX = event.touches[0].pageX;
+    touchStartY = event.touches[0].pageY;
   }, false);
 
   // 移動時
   gameBoard.addEventListener('touchmove', function(event) {
     event.preventDefault();
 
-    var touchMoveX = event.changedTouches[0].pageX;
-    var touchMoveY = event.changedTouches[0].pageY;
+    touchMoveX = event.changedTouches[0].pageX;
+    touchMoveY = event.changedTouches[0].pageY;
   }, false);
 
   // 終了時
   gameBoard.addEventListener('touchend', function(event) {
-    var XLength = touchMoveX - touchStartX
-    var YLength = touchMoveY - touchStartY
-    var XMoveThanY = (Math.abs(XLength) > Math.abs(YLength))
+    XLength = touchMoveX - touchStartX
+    YLength = touchMoveY - touchStartY
+    XMoveThanY = (Math.abs(XLength) > Math.abs(YLength))
 
     // 移動量の判定
     if (XMoveThanY) {
