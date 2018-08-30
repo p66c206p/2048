@@ -41,14 +41,16 @@ function moveBoardWithKey(event) {
 }
 
 function flickStart(event) {
-  event.preventDefault();
+  event.preventDefault();   // 上位のイベント処理を停止させる
+                            // ex. touch長押しによる文字列の選択
 
   touchStartX = event.touches[0].pageX;
   touchStartY = event.touches[0].pageY;
 }
 
 function flicking(event) {
-  event.preventDefault();
+  event.preventDefault();   // 上位のイベント処理を停止させる
+                            // ex. touchmoveによる画面スクロール
 
   touchMoveX = event.changedTouches[0].pageX;
   touchMoveY = event.changedTouches[0].pageY;
