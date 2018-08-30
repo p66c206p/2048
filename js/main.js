@@ -244,74 +244,147 @@ class Board {
   }
 }
 
-const board = new Board();
 
-window.addEventListener('load', function(event) {
+// - global -
+var board = new Board();
+var newGame = document.getElementById('new-game');
+var gameBoard = document.getElementById('game-board');
+var touchStartX, touchStartY;
+var touchMoveX, touchMoveY;
+var XLength, YLength;
+
+// - main -
+window.onload = function() {
+  console.log(77);
+  // 盤面の初期化
   board.initialize();
-});
 
-$('#new-game').click(function() {
-  board.initialize();
-  console.log(4);
-});
+  // イベントの登録
+  newGame.addEventListener('click', function() {board.initialize()}, false);
+  window.addEventListener('keydown', keyDown);
+  gameBoard.addEventListener('touchstart', touchStart, false);
+  gameBoard.addEventListener('touchmove', touchMove, false);
+  gameBoard.addEventListener('touchend', touchEnd, false);
 
-// 矢印キーでの操作
-function selectMoveBykeyDown(e) {
+}
+
+// - event -
+function keyDown(event) {
   var direction = {
-    '37' : 'left',
-    '38' : 'up',
-    '39' : 'right',
-    '40' : 'down',
+    '37' : 'left' , // key:[←]
+    '38' : 'up'   , // key:[↑]
+    '39' : 'right', // key:[→]
+    '40' : 'down'   // key:[↓]
   };
 
-  if (direction[e.keyCode]) {
-    board.move(direction[e.keyCode]);
+  if (direction[event.keyCode]) {
+    board.move(direction[event.keyCode]);
   }
 }
-document.onkeydown = selectMoveBykeyDown;
 
-// フリック操作
-var gameBoard = document.getElementById('game-board');
-window.addEventListener('load', function(event) {
-  var touchStartX, touchStartY;
-  var touchMoveX, touchMoveY;
-  var XLength, YLength;
+function touchStart(event) {
+  event.preventDefault();
 
-  // 開始時
-  gameBoard.addEventListener('touchstart', function(event) {
-    event.preventDefault();
+  touchStartX = event.touches[0].pageX;
+  touchStartY = event.touches[0].pageY;
+}
 
-    touchStartX = event.touches[0].pageX;
-    touchStartY = event.touches[0].pageY;
-  }, false);
+function touchMove(event) {
+  event.preventDefault();
 
-  // 移動時
-  gameBoard.addEventListener('touchmove', function(event) {
-    event.preventDefault();
+  touchMoveX = event.changedTouches[0].pageX;
+  touchMoveY = event.changedTouches[0].pageY;
+}
 
-    touchMoveX = event.changedTouches[0].pageX;
-    touchMoveY = event.changedTouches[0].pageY;
-  }, false);
+function touchEnd(event) {
+  XLength = touchMoveX - touchStartX;
+  YLength = touchMoveY - touchStartY;
+  var XMoveThanY = (Math.abs(XLength) > Math.abs(YLength));
 
-  // 終了時
-  gameBoard.addEventListener('touchend', function(event) {
-    XLength = touchMoveX - touchStartX
-    YLength = touchMoveY - touchStartY
-    XMoveThanY = (Math.abs(XLength) > Math.abs(YLength))
-
-    // 移動量の判定
-    if (XMoveThanY) {
-      if (XLength < -50) {
-        board.move('left');
-      } else if (XLength > 50) {
-        board.move('right');
-      }
-    } else {  // if (YMoveThanX)
-      if (YLength < -50) {
-        board.move('up');
-      } else if (YLength > 50) {
-        board.move('down');
-      }
+  if (XMoveThanY) {
+    if (XLength < -50) {
+      board.move('left');
+    } else if (XLength > 50) {
+      board.move('right');
     }
-  }, false);
-}, false);
+  } else {  // if (YMoveThanX)
+    if (YLength < -50) {
+      board.move('up');
+    } else if (YLength > 50) {
+      board.move('down');
+    }
+  }
+}
+
+
+// const board = new Board();
+//
+// window.addEventListener('load', function(event) {
+//   board.initialize();
+// });
+//
+// $('#new-game').click(function() {
+//   board.initialize();
+//   console.log(4);
+// });
+//
+// // 矢印キーでの操作
+// function selectMoveBykeyDown(e) {
+//   var direction = {
+//     '37' : 'left',
+//     '38' : 'up',
+//     '39' : 'right',
+//     '40' : 'down',
+//   };
+//
+//   if (direction[e.keyCode]) {
+//     board.move(direction[e.keyCode]);
+//   }
+// }
+// document.onkeydown = selectMoveBykeyDown;
+//
+// // フリック操作
+// var gameBoard = document.getElementById('game-board');
+// window.addEventListener('load', function(event) {
+//   var touchStartX, touchStartY;
+//   var touchMoveX, touchMoveY;
+//   var XLength, YLength;
+//
+//   // 開始時
+//   gameBoard.addEventListener('touchstart', function(event) {
+//     event.preventDefault();
+//
+//     touchStartX = event.touches[0].pageX;
+//     touchStartY = event.touches[0].pageY;
+//   }, false);
+//
+//   // 移動時
+//   gameBoard.addEventListener('touchmove', function(event) {
+//     event.preventDefault();
+//
+//     touchMoveX = event.changedTouches[0].pageX;
+//     touchMoveY = event.changedTouches[0].pageY;
+//   }, false);
+//
+//   // 終了時
+//   gameBoard.addEventListener('touchend', function(event) {
+//     XLength = touchMoveX - touchStartX
+//     YLength = touchMoveY - touchStartY
+//     XMoveThanY = (Math.abs(XLength) > Math.abs(YLength))
+//
+//     // 移動量の判定
+//     if (XMoveThanY) {
+//       if (XLength < -50) {
+//         board.move('left');
+//       } else if (XLength > 50) {
+//         board.move('right');
+//       }
+//     } else {  // if (YMoveThanX)
+//       if (YLength < -50) {
+//         board.move('up');
+//       } else if (YLength > 50) {
+//         board.move('down');
+//       }
+//     }
+//   }, false);
+// }, false);
