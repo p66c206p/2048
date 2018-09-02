@@ -120,7 +120,7 @@ table td {
   background: #3c3a32;
 }
   @media screen and (max-width: 520px) {
-    [class="cell 2048"] {
+    [class="cell 2048over"] {
       font-size: 10px;
     }
   }
