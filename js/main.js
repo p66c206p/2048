@@ -7,19 +7,18 @@
 var board = new Board();
 var newGame = document.getElementById('new-game');
 var gameBoard = document.getElementById('game-board');
-var touchStartX, touchStartY, touchMoveX, touchMoveY;
+var touchStartX, touchStartY, touchEndX, touchEndY;
 
 // - main -
 window.onload = function() {
   gameStart();
-  console.log(3);
 
   // イベントの登録
   newGame.addEventListener('click', gameStart);
-  window.addEventListener('keydown', moveBoardWithKey);
+  window.addEventListener('keydown', moveTilesWithKey);
   gameBoard.addEventListener('touchstart', flickStart);
   gameBoard.addEventListener('touchmove', flicking);
-  gameBoard.addEventListener('touchend', moveBoardWithFlick);
+  gameBoard.addEventListener('touchend', moveTilesWithFlick);
 }
 
 // - event -
@@ -27,7 +26,7 @@ function gameStart() {
   board.initialize();
 }
 
-function moveBoardWithKey(event) {
+function moveTilesWithKey(event) {
   var keyDirection = {
     '37' : 'left' ,   // [←]
     '38' : 'up'   ,   // [↑]
@@ -36,7 +35,7 @@ function moveBoardWithKey(event) {
   };
 
   if (keyDirection[event.keyCode]) {
-    board.move(keyDirection[event.keyCode]);
+    board.moveTiles(keyDirection[event.keyCode]);
   }
 }
 
@@ -52,26 +51,26 @@ function flicking(event) {
   event.preventDefault();   // 上位のイベント処理を停止させる
                             // ex. touchmoveによる画面スクロール
 
-  touchMoveX = event.changedTouches[0].pageX;
-  touchMoveY = event.changedTouches[0].pageY;
+  touchEndX = event.changedTouches[0].pageX;
+  touchEndY = event.changedTouches[0].pageY;
 }
 
-function moveBoardWithFlick(event) {
-  var XLength = touchMoveX - touchStartX;
-  var YLength = touchMoveY - touchStartY;
+function moveTilesWithFlick(event) {
+  var XLength = touchEndX - touchStartX;
+  var YLength = touchEndY - touchStartY;
   var XMoveThanY = (Math.abs(XLength) > Math.abs(YLength));
 
   if (XMoveThanY) {
     if (XLength < -50) {
-      board.move('left');
+      board.moveTiles('left');
     } else if (XLength > 50) {
-      board.move('right');
+      board.moveTiles('right');
     }
   } else {  // if (YMoveThanX)
     if (YLength < -50) {
-      board.move('up');
+      board.moveTiles('up');
     } else if (YLength > 50) {
-      board.move('down');
+      board.moveTiles('down');
     }
   }
 }
