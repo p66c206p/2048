@@ -3,9 +3,9 @@
  * @brief 盤面Boardと、その動作の定義
  */
 
-const N = 4;                  // 盤面のサイズ(N x N)
-const PROBABILITY_2 = 0.75;   // 新しく生成されるタイルの値が2である確率
-const CLEAR_VALUE = 2048;      // ゲームクリアとする時のタイルの最大値
+const N = 4;                     // 盤面のサイズ(N x N)
+const PROBABILITY_OF_2 = 0.75;   // 新しく生成されるタイルの値が2である確率
+const CLEAR_VALUE = 2048;        // ゲームクリアとする時のタイルの最大値
 
 class Board {
   constructor() {
@@ -33,7 +33,7 @@ class Board {
     } while (this[x][y] != null);
 
     // 下記drawメソッドにて、新しいタイルにidを付与する為に便宜上値を'newX'とする
-    if (Math.random() < PROBABILITY_2) {
+    if (Math.random() < PROBABILITY_OF_2) {
       this[x][y] = 'new2';
     } else {
       this[x][y] = 'new4';
@@ -82,7 +82,7 @@ class Board {
     $('#new-tile').show(300);
   }
 
-  move(direction) {
+  moveTiles(direction) {
     // タイルをdirection方向に寄せるメソッド
     // 盤面が変わった場合はその後の処理も行う
 
