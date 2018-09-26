@@ -206,12 +206,24 @@ class Board {
   }
 
   canMove() {
+    if (this.includesEmptyTiles() || this.canCombineTiles() ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  includesEmptyTiles() {
     for (var i = 0; i < N; i++) {
       if (this[i].includes(null)) {
         return true;
       }
     }
 
+    return false;
+  }
+
+  canCombineTiles() {
     for (var x = 0; x < N; x++) {
       for (var y = 0; y < N - 1; y++) {
         if (this[x][y] == this[x][y + 1]) {
@@ -223,9 +235,10 @@ class Board {
       }
     }
 
+    // x, y方向両方を走査する
     if (!this.isTransposed) {
       this.transpose();
-      return this.canMove();
+      return this.canCombineTiles();
     }
 
     this.transpose();
