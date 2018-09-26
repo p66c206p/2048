@@ -42,85 +42,84 @@ table td {
       border-radius: 3px;
     }
   }
-
-[class="cell 2"] {
+.cell-2 {
   color: #776e65;
   background: #eee4da;
 }
-[class="cell 4"] {
+.cell-4 {
   color: #776e65;
   background: #ede0c8;
 }
-[class="cell 8"] {
+.cell-8 {
   color: #f9f6f2;
   background: #f2b179;
 }
-[class="cell 16"] {
+.cell-16 {
   color: #f9f6f2;
   background: #f59563;
 }
-[class="cell 32"] {
+.cell-32 {
   color: #f9f6f2;
   background: #f67c5f;
 }
-[class="cell 64"] {
+.cell-64 {
   color: #f9f6f2;
   background: #f65e3b;
 }
-[class="cell 128"] {
+.cell-128 {
   color: #f9f6f2;
   background: #edcf72;
 }
   @media screen and (max-width: 520px) {
-    [class="cell 128"] {
+    .cell-128 {
       font-size: 25px;
     }
   }
-[class="cell 256"] {
+.cell-256 {
   color: #f9f6f2;
   background: #edcc61;
 }
   @media screen and (max-width: 520px) {
-    [class="cell 256"] {
+    .cell-256 {
       font-size: 25px;
     }
   }
-[class="cell 512"] {
+.cell-512 {
   color: #f9f6f2;
   background: #edc850;
 }
   @media screen and (max-width: 520px) {
-    [class="cell 512"] {
+    .cell-512 {
       font-size: 25px;
     }
   }
-[class="cell 1024"] {
+.cell-1024 {
   font-size: 35px;
   color: #f9f6f2;
   background: #edc53f;
 }
   @media screen and (max-width: 520px) {
-    [class="cell 1024"] {
+    .cell-1024 {
       font-size: 15px;
     }
   }
-[class="cell 2048"] {
+.cell-2048 {
   font-size: 35px;
   color: #f9f6f2;
   background: #edc22e;
 }
   @media screen and (max-width: 520px) {
-    [class="cell 2048"] {
+    .cell-2048 {
       font-size: 15px;
     }
   }
-[class="cell 2048over"] {
+.cell-2048over {
   font-size: 30px;
   color: #f9f6f2;
   background: #3c3a32;
 }
   @media screen and (max-width: 520px) {
-    [class="cell 2048over"] {
+    .cell-2048over {
       font-size: 10px;
     }
   }
