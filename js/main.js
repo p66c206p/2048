@@ -26,22 +26,6 @@ function startGame() {
   board.initialize();
 }
 
-function getDirectionFromKey() {
-
-}
-
-function getDirectionFromFlick() {
-  var direction = getDirectionFromKey();
-  return direction[key];
-}
-
-function runGame(direction) {
-  var direction = getDirectionFromKey();
-  board.moveTilesTo(direction);
-  board.drawOn(canvas);
-  checkGameState();
-}
-
 function keyControls(event) {
   var key = event.keyCode;
   var direction = {
