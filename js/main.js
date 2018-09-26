@@ -11,31 +11,49 @@ var touchStartX, touchStartY, touchEndX, touchEndY;
 
 // - main -
 window.onload = function() {
-  gameStart();
+  startGame();
 
   // イベントの登録
-  newGame.addEventListener('click', gameStart);
-  window.addEventListener('keydown', moveTilesWithKey);
+  newGame.addEventListener('click', startGame);
+  window.addEventListener('keydown', keyControls);
   gameBoard.addEventListener('touchstart', flickStart);
   gameBoard.addEventListener('touchmove', flicking);
-  gameBoard.addEventListener('touchend', moveTilesWithFlick);
+  gameBoard.addEventListener('touchend', flickControls);
 }
 
 // - event -
-function gameStart() {
+function startGame() {
   board.initialize();
 }
 
-function moveTilesWithKey(event) {
-  var keyDirection = {
+function getDirectionFromKey() {
+
+}
+
+function getDirectionFromFlick() {
+  var direction = getDirectionFromKey();
+  return direction[key];
+}
+
+function runGame(direction) {
+  var direction = getDirectionFromKey();
+  board.moveTilesTo(direction);
+  board.drawOn(canvas);
+  checkGameState();
+}
+
+function keyControls(event) {
+  var key = event.keyCode;
+  var direction = {
     '37' : 'left' ,   // [←]
     '38' : 'up'   ,   // [↑]
     '39' : 'right',   // [→]
     '40' : 'down'     // [↓]
   };
 
-  if (keyDirection[event.keyCode]) {
-    board.moveTiles(keyDirection[event.keyCode]);
+  if (direction[key]) {
+    board.moveTiles(direction[key]);
+    checkGameState();
   }
 }
 
@@ -55,7 +73,7 @@ function flicking(event) {
   touchEndY = event.changedTouches[0].pageY;
 }
 
-function moveTilesWithFlick(event) {
+function flickControls(event) {
   var XLength = touchEndX - touchStartX;
   var YLength = touchEndY - touchStartY;
   var XMoveThanY = (Math.abs(XLength) > Math.abs(YLength));
@@ -72,5 +90,17 @@ function moveTilesWithFlick(event) {
     } else if (YLength > 50) {
       board.moveTiles('down');
     }
+  }
+
+  checkGameState();
+}
+
+function checkGameState() {
+  if (board.hasJustReachedClearValue()) {
+    alert('ゲームクリアです！');
+  }
+
+  if (!board.canMove()) {
+    setTimeout('alert("ゲームオーバーです。")', 300);
   }
 }

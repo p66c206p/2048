@@ -14,7 +14,7 @@ class Board {
   }
 
   initialize() {
-    // x = rows, y = columns
+    // x = row, y = column
     for (var x = 0; x < N; x++) {
       this[x] = [];
       for (var y = 0; y < N; y++) {
@@ -24,6 +24,7 @@ class Board {
 
     this.addNewTile();
     this.addNewTile();
+    this.draw();
   }
 
   addNewTile() {
@@ -32,14 +33,12 @@ class Board {
         var y = Math.floor(Math.random() * N);
     } while (this[x][y] != null);
 
-    // 下記drawメソッドにて、新しいタイルにidを付与する為に便宜上値を'newX'とする
+    // draw()にて、新しいタイルにclassを付与する為に便宜上値を'newX'とする
     if (Math.random() < PROBABILITY_OF_2) {
       this[x][y] = 'new2';
     } else {
       this[x][y] = 'new4';
     }
-
-    this.draw();
   }
 
   draw() {
@@ -49,10 +48,10 @@ class Board {
     for (var x = 0; x < N; x++) {
       tag.push('<tr>');
       for (var y = 0; y < N; y++) {
-        tag.push('<td ');
+        tag.push('<td class="');
 
         if (this[x][y] == 'new2' || this[x][y] == 'new4') {
-          tag.push('id="new-tile" ');
+          tag.push('new-tile ');
           if (this[x][y] == 'new2'){
             this[x][y] = 2;
           } else {
@@ -60,7 +59,7 @@ class Board {
           }
         }
 
-        tag.push('class="cell ');
+        tag.push('cell-');
         if (this[x][y] > 2048) {
           tag.push('2048over');
         } else {
@@ -78,8 +77,8 @@ class Board {
     $('#game-board').html(tag.join(''));
 
     // 新しく生成されたタイルが浮き上がって表示されるアニメーション
-    $('#new-tile').hide();
-    $('#new-tile').show(300);
+    $('.new-tile').hide();
+    $('.new-tile').show(300);
   }
 
   moveTiles(direction) {
@@ -88,24 +87,24 @@ class Board {
 
     this.replaceElementsIfNeeded(direction);
 
-    var hasChanged = false;
+    var moved = false;
 
     for (var i = 0; i < N; i++) {
       var xthis_i = this[i];
 
       this[i] = this.arrange(this[i]);
 
-      if (hasChanged) continue;
+      if (moved) continue;
       if (!this.isEqual(xthis_i, this[i])) {
-        hasChanged = true;
+        moved = true;
       }
     }
 
-    this.undoIfReplaced(direction);
+    this.resetIfReplaced(direction);
 
-    if (hasChanged) {
+    if (moved) {
       this.addNewTile();
-      this.checkGameState();
+      this.draw();
     }
   }
 
@@ -150,7 +149,7 @@ class Board {
     return array;
   }
 
-  undoIfReplaced(direction) {
+  resetIfReplaced(direction) {
     // replaceElementsIfNeededで入れ替えられた対象を元に戻す。
 
     if (direction == 'right' || direction == 'down') {
@@ -161,16 +160,6 @@ class Board {
 
     if (direction == 'up' || direction == 'down') {
       this.transpose();
-    }
-  }
-
-  checkGameState() {
-    if (this.hasJustReachedClearValue()) {
-      alert('ゲームクリアです！');
-    }
-
-    if (!this.canMove()) {
-      setTimeout('alert("ゲームオーバーです。")', 300);
     }
   }
 
