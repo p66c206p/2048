@@ -76,7 +76,7 @@ class Board {
 
     $('#game-board').html(tag.join(''));
 
-    // 新しく生成されたタイルが浮き上がって表示されるアニメーション
+    // 浮き上がって表示されるアニメーション
     $('.new-tile').hide();
     $('.new-tile').show(300);
   }
@@ -85,7 +85,9 @@ class Board {
     // タイルをdirection方向に寄せるメソッド
     // 盤面が変わった場合はその後の処理も行う
 
-    this.replaceElementsIfNeeded(direction);
+    if (direction != 'left') {
+      this.replaceElements(direction);
+    }
 
     var moved = false;
 
@@ -100,7 +102,9 @@ class Board {
       }
     }
 
-    this.resetIfReplaced(direction);
+    if (direction != 'left') {
+      this.resetReplacing(direction);
+    }
 
     if (moved) {
       this.addNewTile();
@@ -108,9 +112,10 @@ class Board {
     }
   }
 
-  replaceElementsIfNeeded(direction) {
-    // 動く方向に応じて、this[0]～this[3]の配列要素の値を入れ直す。
-    // 1234  ex.  left => this[0] = [1, 2, 3, 4] (※入れ直さない)
+  replaceElements(direction) {
+    // 次に処理されるarrangeメソッドが、directionによって分岐するのを避けるために、
+    // 一時的に、配列要素を入れ替えて軸や向きを反転させる処理。
+    // 1234  ex. (left => this[0] = [1, 2, 3, 4])
     // 5678      right => this[0] = [4, 3, 2, 1]
     // 9ABC         up => this[0] = [1, 5, 9, D]
     // DEFG       down => this[0] = [D, 9, 5, 1]
@@ -149,8 +154,8 @@ class Board {
     return array;
   }
 
-  resetIfReplaced(direction) {
-    // replaceElementsIfNeededで入れ替えられた対象を元に戻す。
+  resetReplacing(direction) {
+    // replaceElementsで行った反転処理を元に戻す。
 
     if (direction == 'right' || direction == 'down') {
       for (var i = 0; i < N; i++) {
@@ -196,7 +201,7 @@ class Board {
     if (this.isCleared) return false;
 
     for (var i = 0; i < N; i++) {
-      if (this[i].some(value => value == CLEAR_VALUE)) {
+      if (this[i].includes(CLEAR_VALUE)) {
         this.isCleared = true;
         return true;
       }
