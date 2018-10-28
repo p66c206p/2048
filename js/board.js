@@ -1,4 +1,4 @@
-/*
+﻿/*
  * @file board.js
  * @brief 盤面Boardと、その動作の定義
  */
@@ -103,7 +103,7 @@ class Board {
     }
 
     if (direction != 'left') {
-      this.resetReplacing(direction);
+      this.quitReplacing(direction);
     }
 
     if (moved) {
@@ -154,7 +154,7 @@ class Board {
     return array;
   }
 
-  resetReplacing(direction) {
+  quitReplacing(direction) {
     // replaceElementsで行った反転処理を元に戻す。
 
     if (direction == 'right' || direction == 'down') {
