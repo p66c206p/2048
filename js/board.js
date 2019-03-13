@@ -1,4 +1,4 @@
-﻿/*
+﻿/**
  * @file board.js
  * @brief 盤面Boardと、その動作の定義
  */
@@ -135,6 +135,7 @@ class Board {
     // ex. [2, null, 2, 4] => [4, 4, null, null] (※[8, null,...]とはならない)
 
     // nullの要素を削除
+    // 新しく配列を生成している為、代入する（新しく参照する）必要がある
     array = array.filter(value => value != null);
 
     // array.length - 1 回だけ前後の値を比較したいので、
@@ -188,6 +189,8 @@ class Board {
   }
 
   isEqual(a, b) {
+    // JavaScriptにはequalsメソッドがない為これを用いる
+
     if (!Array.isArray(a) || !Array.isArray(b)) return false;
 
     if (a.toString() == b.toString()) {
@@ -211,14 +214,14 @@ class Board {
   }
 
   canMove() {
-    if (this.includesEmptyTiles() || this.canCombineTiles() ) {
+    if (this.hasEmptyTiles() || this.canCombineTiles() ) {
       return true;
     }
 
     return false;
   }
 
-  includesEmptyTiles() {
+  hasEmptyTiles() {
     for (var i = 0; i < N; i++) {
       if (this[i].includes(null)) {
         return true;
@@ -244,9 +247,9 @@ class Board {
     if (!this.isTransposed) {
       this.transpose();
       return this.canCombineTiles();
+    } else {
+      this.transpose();
+      return false;
     }
-
-    this.transpose();
-    return false;
   }
 }

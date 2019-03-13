@@ -1,12 +1,12 @@
-/*
+﻿/**
  * @file main.js
  * @brief ゲーム全体の流れを管理する処理、イベントに関連する処理
  */
 
 // - global -
-var board = new Board();
-var newGame = document.getElementById('new-game');
-var gameBoard = document.getElementById('game-board');
+const board = new Board();
+const newGame = document.getElementById('new-game');
+const gameBoard = document.getElementById('game-board');
 var touchStartX, touchStartY, touchEndX, touchEndY;
 
 // - main -
@@ -81,7 +81,7 @@ function flickControls(event) {
 
 function checkGameState() {
   if (board.hasJustReachedClearValue()) {
-    alert('ゲームクリアです！');
+    setTimeout('alert("ゲームクリアです！")', 300);
   }
 
   if (!board.canMove()) {
