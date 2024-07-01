@@ -82,6 +82,6 @@ function checkGameState() {
   if (!BOARD.isGameOver())    message = "ゲームオーバーです。";
 
   if (message != null) {
-    setTimeout('alert(message)', 300);
+    setTimeout('alert("aaa")', 300);
   }
 }
