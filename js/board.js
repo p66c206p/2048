@@ -215,7 +215,7 @@ class Board {
 
   isGameOver() {
     if (this.hasEmptyTiles())    return false;
-    if (this.canCombineTiles() ) return false;
+    if (this.canCombineTiles()) return false;
 
     return true;
   }
