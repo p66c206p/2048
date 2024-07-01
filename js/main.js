@@ -61,7 +61,7 @@ function flickAction(event) {
   var deltaX = touchEndX - touchStartX;
   var deltaY = touchEndY - touchStartY;
 
-  var dir;
+  var dir = '';
   if (Math.abs(deltaX) > Math.abs(deltaY)) {
     if (deltaX < -50) dir = 'left';
     if (deltaX > 50)  dir = 'right';
@@ -70,18 +70,19 @@ function flickAction(event) {
     if (deltaY > 50)  dir = 'down';
   }
 
-  if (dir != null) {
+  if (dir != '') {
     BOARD.slideTiles(dir);
     checkGameState();
   }
 }
 
 function checkGameState() {
-  var message;
+  var message = "";
   if (BOARD.isJustCleared()) message = "ゲームクリアです！";
   if (BOARD.isGameOver())    message = "ゲームオーバーです。";
 
-  if (message != undefined) {
+  if (message != "") {
     setTimeout('alert(message)', 300);
+    setTimeout('alert("e")', 300);
   }
 }
