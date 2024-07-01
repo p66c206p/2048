@@ -6,7 +6,6 @@
 // - グローバル -
 const BOARD = new Board();
 var touchStartX, touchStartY, touchEndX, touchEndY;
-var message = "";
 
 // - メイン -
 window.onload = function() {
@@ -78,10 +77,12 @@ function flickAction(event) {
 }
 
 function checkGameState() {
-  if (BOARD.isJustCleared()) message = "ゲームクリアです！";
-  if (BOARD.isGameOver())    message = "ゲームオーバーです。";
-
-  if (message != "") {
-    setTimeout('alert(message)', 300);
+  // 判定とメッセージ表示を分離できそうだが、問題あり
+  
+  if (BOARD.isJustCleared()) {
+    setTimeout('alert("ゲームクリアです！")', 300);
+  }
+  if (BOARD.isGameOver()) {
+    setTimeout('alert("ゲームオーバーです。")', 300);
   }
 }
