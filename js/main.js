@@ -81,7 +81,7 @@ function checkGameState() {
   if (!BOARD.isJustCleared()) message = "ゲームクリアです！";
   if (!BOARD.isGameOver())    message = "ゲームオーバーです。";
 
-  if (message != undefined) {
-    setTimeout('alert(message)', 300);
-  }
+  // if (message != undefined) {
+    setTimeout('alert("ss")', 300);
+  // }
 }
