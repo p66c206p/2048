@@ -6,6 +6,7 @@
 // - グローバル -
 const BOARD = new Board();
 var touchStartX, touchStartY, touchEndX, touchEndY;
+var message = "";
 
 // - メイン -
 window.onload = function() {
@@ -77,16 +78,10 @@ function flickAction(event) {
 }
 
 function checkGameState() {
-  var message = "";
   if (BOARD.isJustCleared()) message = "ゲームクリアです！";
   if (BOARD.isGameOver())    message = "ゲームオーバーです。";
 
-  console.log(message);
-  console.log(1);
   if (message != "") {
     setTimeout('alert(message)', 300);
-    setTimeout('alert("e")', 300);
-    console.log(message);
-    console.log(2);
   }
 }
