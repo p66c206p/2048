@@ -30,7 +30,7 @@ function keyAction(event) {
   var key = event.keyCode;
   const direction = {
     '37' : 'left' ,   // [←]
-    '38' : 'up'   ,   // [↑]
+    // '38' : 'up'   ,   // [↑]
     '39' : 'right',   // [→]
     '40' : 'down'     // [↓]
   };
