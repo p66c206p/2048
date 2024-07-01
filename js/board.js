@@ -22,12 +22,12 @@ class Board {
       }
     }
 
-    this.addNewTile();
-    this.addNewTile();
+    this.addTile();
+    this.addTile();
     this.draw();
   }
 
-  addNewTile() {
+  addTile() {
     do {
         var x = Math.floor(Math.random() * N);
         var y = Math.floor(Math.random() * N);
@@ -81,7 +81,7 @@ class Board {
     $('.new-tile').show(300);
   }
 
-  moveTiles(direction) {
+  slideTiles(direction) {
     // タイルをdirection方向に寄せるメソッド
     // 盤面が変わった場合はその後の処理も行う
 
@@ -107,7 +107,7 @@ class Board {
     }
 
     if (moved) {
-      this.addNewTile();
+      this.addTile();
       this.draw();
     }
   }
@@ -200,7 +200,7 @@ class Board {
     }
   }
 
-  hasJustReachedClearValue() {
+  isJustCleared() {
     if (this.isCleared) return false;
 
     for (var i = 0; i < N; i++) {
@@ -213,12 +213,11 @@ class Board {
     return false;
   }
 
-  canMove() {
-    if (this.hasEmptyTiles() || this.canCombineTiles() ) {
-      return true;
-    }
+  isGameOver() {
+    if (this.hasEmptyTiles()) return false;
+    if (this.canCombineTiles() ) return false;
 
-    return false;
+    return true;
   }
 
   hasEmptyTiles() {
