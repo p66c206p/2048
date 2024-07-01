@@ -1,34 +1,34 @@
 ﻿/**
  * @file main.js
- * @brief ゲーム全体の流れを管理する処理、イベントに関連する処理
+ * @brief 操作の受付、ゲームクリア/ゲームオーバー時のメッセージ表示
  */
 
-// - global -
-const board = new Board();
-const newGame = document.getElementById('new-game');
-const gameBoard = document.getElementById('game-board');
+// - グローバル -
+const BOARD = new Board();
 var touchStartX, touchStartY, touchEndX, touchEndY;
 
-// - main -
+// - メイン -
 window.onload = function() {
-  startGame();
+  gameStart();
 
-  // イベントの登録
-  newGame.addEventListener('click', startGame);
-  window.addEventListener('keydown', keyControls);
+  // 操作の受付
+  const newGame = document.getElementById('new-game');
+  const gameBoard = document.getElementById('game-board');
+  newGame.addEventListener('click', gameStart);
+  window.addEventListener('keydown', keyAction);
   gameBoard.addEventListener('touchstart', flickStart);
   gameBoard.addEventListener('touchmove', flicking);
-  gameBoard.addEventListener('touchend', flickControls);
+  gameBoard.addEventListener('touchend', flickAction);
 }
 
-// - event -
-function startGame() {
-  board.initialize();
+// - イベント -
+function gameStart() {
+  BOARD.initialize();
 }
 
-function keyControls(event) {
+function keyAction(event) {
   var key = event.keyCode;
-  var direction = {
+  const direction = {
     '37' : 'left' ,   // [←]
     '38' : 'up'   ,   // [↑]
     '39' : 'right',   // [→]
@@ -36,55 +36,52 @@ function keyControls(event) {
   };
 
   if (direction[key]) {
-    board.moveTiles(direction[key]);
+    BOARD.slideTiles(direction[key]);
     checkGameState();
   }
 }
 
 function flickStart(event) {
-  event.preventDefault();   // 上位のイベント処理を停止させる
-                            // ex. touch長押しによる文字列の選択
+  event.preventDefault();   // 上位のイベント処理を禁じる
+                            // ex. タップ長押しによる文字列の選択
 
   touchStartX = event.touches[0].pageX;
   touchStartY = event.touches[0].pageY;
 }
 
 function flicking(event) {
-  event.preventDefault();   // 上位のイベント処理を停止させる
-                            // ex. touchmoveによる画面スクロール
+  event.preventDefault();   // 上位のイベント処理を禁じる
+                            // ex. フリックによる画面スクロール
 
   touchEndX = event.changedTouches[0].pageX;
   touchEndY = event.changedTouches[0].pageY;
 }
 
-function flickControls(event) {
-  var XLength = touchEndX - touchStartX;
-  var YLength = touchEndY - touchStartY;
-  var XMoveThanY = (Math.abs(XLength) > Math.abs(YLength));
+function flickAction(event) {
+  var deltaX = touchEndX - touchStartX;
+  var deltaY = touchEndY - touchStartY;
 
-  if (XMoveThanY) {
-    if (XLength < -50) {
-      board.moveTiles('left');
-    } else if (XLength > 50) {
-      board.moveTiles('right');
-    }
-  } else {  // if (YMoveThanX)
-    if (YLength < -50) {
-      board.moveTiles('up');
-    } else if (YLength > 50) {
-      board.moveTiles('down');
-    }
+  var dir;
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    if (deltaX < -50) dir = 'left';
+    if (deltaX > 50)  dir = 'right';
+  } else {
+    if (deltaY < -50) dir = 'up';
+    if (deltaY > 50)  dir = 'down';
   }
 
-  checkGameState();
+  if (dir != null) {
+    BOARD.slideTiles(dir);
+    checkGameState();
+  }
 }
 
 function checkGameState() {
-  if (board.hasJustReachedClearValue()) {
-    setTimeout('alert("ゲームクリアです！")', 300);
-  }
+  var message;
+  if (BOARD.isJustCleared()) message = "ゲームクリアです！";
+  if (BOARD.isGameOver())    message = "ゲームオーバーです。";
 
-  if (!board.canMove()) {
-    setTimeout('alert("ゲームオーバーです。")', 300);
+  if (message) {
+    setTimeout('alert(message)', 300);
   }
 }
