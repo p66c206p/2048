@@ -78,8 +78,8 @@ function flickAction(event) {
 
 function checkGameState() {
   var message;
-  if (BOARD.isJustCleared()) message = "ゲームクリアです！";
-  if (BOARD.isGameOver())    message = "ゲームオーバーです。";
+  if (!BOARD.isJustCleared()) message = "ゲームクリアです！";
+  if (!BOARD.isGameOver())    message = "ゲームオーバーです。";
 
   if (message != null) {
     setTimeout('alert(message)', 300);
