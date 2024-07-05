@@ -1,24 +1,24 @@
-﻿/**
+/**
  * @file main.js
  * @brief 操作の受付、ゲームクリア/ゲームオーバー時のメッセージ表示
  */
 
 // - グローバル -
 const BOARD = new Board();
-var touchStartX, touchStartY, touchEndX, touchEndY;
+let touchStartX, touchStartY, touchEndX, touchEndY;
 
 // - メイン -
 window.onload = function() {
   gameStart();
 
   // 操作の受付
-  const newGame = document.getElementById('new-game');
-  const gameBoard = document.getElementById('game-board');
-  newGame.addEventListener('click', gameStart);
+  const NEW_GAME = document.getElementById('new-game');
+  const GAME_BOARD = document.getElementById('game-board');
+  NEW_GAME.addEventListener('click', gameStart);
   window.addEventListener('keydown', keyAction);
-  gameBoard.addEventListener('touchstart', flickStart);
-  gameBoard.addEventListener('touchmove', flicking);
-  gameBoard.addEventListener('touchend', flickAction);
+  GAME_BOARD.addEventListener('touchstart', flickStart);
+  GAME_BOARD.addEventListener('touchmove', flicking);
+  GAME_BOARD.addEventListener('touchend', flickAction);
 }
 
 // - イベント -
@@ -27,7 +27,7 @@ function gameStart() {
 }
 
 function keyAction(event) {
-  var key = event.keyCode;
+  let key = event.keyCode;
   const direction = {
     '37' : 'left' ,   // [←]
     '38' : 'up'   ,   // [↑]
@@ -58,10 +58,10 @@ function flicking(event) {
 }
 
 function flickAction(event) {
-  var deltaX = touchEndX - touchStartX;
-  var deltaY = touchEndY - touchStartY;
+  let deltaX = touchEndX - touchStartX;
+  let deltaY = touchEndY - touchStartY;
 
-  var dir = '';
+  let dir = '';
   if (Math.abs(deltaX) > Math.abs(deltaY)) {
     if (deltaX < -50) dir = 'left';
     if (deltaX > 50)  dir = 'right';
@@ -77,7 +77,7 @@ function flickAction(event) {
 }
 
 function checkGameState() {
-  // 判定とメッセージ表示を分離できそうだが、問題あり
+  // TODO: 判定とメッセージ表示を分離できそうだが、問題あり
   
   if (BOARD.isJustCleared()) {
     setTimeout('alert("ゲームクリアです！")', 300);
