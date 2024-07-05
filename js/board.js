@@ -1,23 +1,22 @@
-﻿/**
+/**
  * @file board.js
- * @brief 盤面Boardと、その動作の定義
+ * @brief ゲーム盤面とその動作
  */
 
-const N = 4;                     // 盤面のサイズ(N x N)
-const PROBABILITY_OF_2 = 0.75;   // 新しく生成されるタイルの値が2である確率
-const CLEAR_VALUE = 2048;        // ゲームクリアとする時のタイルの最大値
+const N = 4;                     // 盤面の行数,列数
+const PROBABILITY_OF_2 = 0.75;   // 追加されるタイルの値が2である確率
+const CLEAR_VALUE = 2048;        // この値のタイルを作った時ゲームクリアとする
 
 class Board {
   constructor() {
     this.isCleared = false;
-    this.isTransposed = false;
   }
 
   initialize() {
     // x = row, y = column
-    for (var x = 0; x < N; x++) {
+    for (let x = 0; x < N; x++) {
       this[x] = [];
-      for (var y = 0; y < N; y++) {
+      for (let y = 0; y < N; y++) {
         this[x][y] = null;
       }
     }
@@ -28,9 +27,10 @@ class Board {
   }
 
   addTile() {
+    let x, y;
     do {
-        var x = Math.floor(Math.random() * N);
-        var y = Math.floor(Math.random() * N);
+        x = Math.floor(Math.random() * N);
+        y = Math.floor(Math.random() * N);
     } while (this[x][y] != null);
 
     // draw()にて、新しいタイルにclassを付与する為に便宜上値を'newX'とする
@@ -42,12 +42,12 @@ class Board {
   }
 
   draw() {
-    var tag = [];
+    let tag = [];
 
     tag.push('<table>');
-    for (var x = 0; x < N; x++) {
+    for (let x = 0; x < N; x++) {
       tag.push('<tr>');
-      for (var y = 0; y < N; y++) {
+      for (let y = 0; y < N; y++) {
         tag.push('<td class="');
 
         if (this[x][y] == 'new2' || this[x][y] == 'new4') {
@@ -82,72 +82,65 @@ class Board {
   }
 
   slideTiles(direction) {
-    // タイルをdirection方向に寄せるメソッド
-    // 盤面が変わった場合はその後の処理も行う
+    // 全てのタイルを上下左右いずれかの方向に寄せる。
 
-    if (direction != 'left') {
-      this.replaceElements(direction);
-    }
+    this.flip(direction);
 
-    var moved = false;
+    let slided = false;
+    for (let i = 0; i < N; i++) {
+      let old = this[i];
 
-    for (var i = 0; i < N; i++) {
-      var xthis_i = this[i];
+      this[i] = this.mergeAndShift(this[i]);
 
-      this[i] = this.arrange(this[i]);
-
-      if (moved) continue;
-      if (!this.isEqual(xthis_i, this[i])) {
-        moved = true;
+      if (slided) continue;
+      if (!this.isEqual(old, this[i])) {
+        slided = true;
       }
     }
 
-    if (direction != 'left') {
-      this.quitReplacing(direction);
-    }
+    this.unflip(direction);
 
-    if (moved) {
+    if (slided) {
       this.addTile();
       this.draw();
     }
   }
 
-  replaceElements(direction) {
-    // 次に処理されるarrangeメソッドが、directionによって分岐するのを避けるために、
+  flip(direction) {
+    // 次に処理されるmergeAndShift()が、directionによって分岐するのを避けるために、
     // 一時的に、配列要素を入れ替えて軸や向きを反転させる処理。
     // 1234  ex. (left => this[0] = [1, 2, 3, 4])
     // 5678      right => this[0] = [4, 3, 2, 1]
     // 9ABC         up => this[0] = [1, 5, 9, D]
     // DEFG       down => this[0] = [D, 9, 5, 1]
 
-    if (direction == 'up' || direction == 'down') {
+    if (direction == 'down' || direction == 'up') {
       this.transpose();
     }
 
-    if (direction == 'right' || direction == 'down') {
-      for (var i = 0; i < N; i++) {
+    if (direction == 'down' || direction == 'right') {
+      for (let i = 0; i < N; i++) {
         this[i].reverse();
       }
     }
   }
 
-  arrange(array) {
+  mergeAndShift(array) {
+    // 同じ値のタイルを合体させて詰める。
     // ex. [2, null, 2, 4] => [4, 4, null, null] (※[8, null,...]とはならない)
 
-    // nullの要素を削除
-    // 新しく配列を生成している為、代入する（新しく参照する）必要がある
+    // [2, null, 2, 4] => [2, 2, 4]
     array = array.filter(value => value != null);
 
-    // array.length - 1 回だけ前後の値を比較したいので、
-    // array.length を N としてはいけない
-    for (var i = 0; i < array.length - 1; i++) {
+    // [2, 2, 4] => [4, 4]
+    for (let i = 0; i < array.length - 1; i++) {
       if (array[i] == array[i + 1]) {
         array[i] *= 2;
         array.splice(i + 1, 1);
       }
     }
 
-    // 要素数を元に戻す
+    // [4, 4] => [4, 4, null, null]
     while (array.length < N) {
       array.push(null);
     }
@@ -155,37 +148,37 @@ class Board {
     return array;
   }
 
-  quitReplacing(direction) {
-    // replaceElementsで行った反転処理を元に戻す。
+  unflip(direction) {
+    // flip()で行った反転処理を元に戻す。
 
-    if (direction == 'right' || direction == 'down') {
-      for (var i = 0; i < N; i++) {
+    if (direction == 'down' || direction == 'right') {
+      for (let i = 0; i < N; i++) {
         this[i].reverse();
       }
     }
 
-    if (direction == 'up' || direction == 'down') {
+    if (direction == 'down' || direction == 'up') {
       this.transpose();
     }
   }
 
   transpose() {
-    var tmpBoard = [];
+    // 2次元配列の行と列を入れ替える。
+    
+    let tmpBoard = [];
 
-    for (var y = 0; y < N; y++) {
-      tmpBoard[y] = [];
-      for (var x = 0; x < N; x++) {
-        tmpBoard[y][x] = this[x][y];
+    for (let j = 0; j < N; j++) {
+      tmpBoard[j] = [];
+      for (let i = 0; i < N; i++) {
+        tmpBoard[j][i] = this[i][j];
       }
     }
 
-    for (var x = 0; x < N; x++) {
-      for (var y = 0; y < N; y++) {
-        this[x][y] = tmpBoard[x][y];
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; y < N; j++) {
+        this[i][j] = tmpBoard[i][j];
       }
     }
-
-    this.isTransposed = !this.isTransposed;
   }
 
   isEqual(a, b) {
@@ -203,7 +196,7 @@ class Board {
   isJustCleared() {
     if (this.isCleared) return false;
 
-    for (var i = 0; i < N; i++) {
+    for (let i = 0; i < N; i++) {
       if (this[i].includes(CLEAR_VALUE)) {
         this.isCleared = true;
         return true;
@@ -221,7 +214,7 @@ class Board {
   }
 
   hasEmptyTiles() {
-    for (var i = 0; i < N; i++) {
+    for (let i = 0; i < N; i++) {
       if (this[i].includes(null)) {
         return true;
       }
@@ -231,24 +224,13 @@ class Board {
   }
 
   canCombineTiles() {
-    for (var x = 0; x < N; x++) {
-      for (var y = 0; y < N - 1; y++) {
-        if (this[x][y] == this[x][y + 1]) {
-          if (this.isTransposed) {
-            this.transpose();
-          }
-          return true;
-        }
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < N - 1; j++) {
+        if (this[i][j] == this[i][j + 1]) return true;
+        if (this[j][i] == this[j + 1][i]) return true;
       }
     }
 
-    // x, y方向両方を走査する
-    if (!this.isTransposed) {
-      this.transpose();
-      return this.canCombineTiles();
-    } else {
-      this.transpose();
-      return false;
-    }
+    return false;
   }
 }
