@@ -82,7 +82,8 @@ class Board {
   }
 
   slideTiles(direction) {
-    // 全てのタイルを上下左右いずれかの方向に寄せる。
+    // タイルをdirection方向に寄せるメソッド
+    // 盤面が変わった場合はその後の処理も行う
 
     this.flip(direction);
 
@@ -175,7 +176,7 @@ class Board {
     }
 
     for (let i = 0; i < N; i++) {
-      for (let j = 0; y < N; j++) {
+      for (let j = 0; j < N; j++) {
         this[i][j] = tmpBoard[i][j];
       }
     }
