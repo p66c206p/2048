@@ -27,18 +27,24 @@ class Board {
   }
 
   addTile() {
+    // タイルを追加する。
+
+    // 挿入位置を決める
     let x, y;
     do {
         x = Math.floor(Math.random() * N);
         y = Math.floor(Math.random() * N);
     } while (this[x][y] != null);
 
-    // draw()にて、新しいタイルにclassを付与する為に便宜上値を'newX'とする
+    // タイルの値を2 or 4に決める
+    // （'newX'とする理由は、draw()にて新しいタイルにclassを付与するため）
+    let value = 'new4';
     if (Math.random() < PROBABILITY_OF_2) {
-      this[x][y] = 'new2';
-    } else {
-      this[x][y] = 'new4';
+      value = 'new2';
     }
+
+    // タイルを追加する
+    this[x][y] = value;
   }
 
   draw() {
@@ -82,8 +88,8 @@ class Board {
   }
 
   slideTiles(direction) {
-    // タイルをdirection方向に寄せるメソッド
-    // 盤面が変わった場合はその後の処理も行う
+    // 入力された方向にタイルを寄せる。
+    // （盤面が変わった場合はその後の処理も行う）
 
     this.flip(direction);
 
@@ -91,7 +97,7 @@ class Board {
     for (let i = 0; i < N; i++) {
       let old = this[i];
 
-      this[i] = this.mergeAndShift(this[i]);
+      this[i] = this.combineAndShift(this[i]);
 
       if (slided) continue;
       if (!this.isEqual(old, this[i])) {
@@ -108,7 +114,7 @@ class Board {
   }
 
   flip(direction) {
-    // 次に処理されるmergeAndShift()が、directionによって分岐するのを避けるために、
+    // 次に処理されるcombineAndShift()が、directionによって分岐するのを避けるために、
     // 一時的に、配列要素を入れ替えて軸や向きを反転させる処理。
     // 1234  ex. (left => this[0] = [1, 2, 3, 4])
     // 5678      right => this[0] = [4, 3, 2, 1]
@@ -126,8 +132,8 @@ class Board {
     }
   }
 
-  mergeAndShift(array) {
-    // 同じ値のタイルを合体させて詰める。
+  combineAndShift(array) {
+    // 同じ値のタイルを合体し、詰める。
     // ex. [2, null, 2, 4] => [4, 4, null, null] (※[8, null,...]とはならない)
 
     // [2, null, 2, 4] => [2, 2, 4]
@@ -208,13 +214,13 @@ class Board {
   }
 
   isGameOver() {
-    if (this.hasEmptyTiles())   return false;
+    if (this.canAddTile())   return false;
     if (this.canCombineTiles()) return false;
 
     return true;
   }
 
-  hasEmptyTiles() {
+  canAddTile() {
     for (let i = 0; i < N; i++) {
       if (this[i].includes(null)) {
         return true;
